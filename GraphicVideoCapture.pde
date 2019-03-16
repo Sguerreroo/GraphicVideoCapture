@@ -7,6 +7,7 @@ Capture cam;
 CVImage img11, img12, img21, img22;
 int dimension, thresholdSquareSize, xThreshold, yThreshold;
 int red, green, blue;
+boolean mainScreen = true;
 
 void setup() {
   size(1280, 720);
@@ -26,37 +27,40 @@ void setup() {
   img22 = new CVImage(cam.width, cam.height);
 }
 
-void draw() {  
-  if (cam.available()) {
-    background(0);
-    cam.read();
+void draw() {
+  if (!mainScreen) {
+    if (cam.available()) {
+      background(0);
+      cam.read();
 
-    img11.copy(cam, 0, 0, cam.width, cam.height, 
-      0, 0, img11.width, img11.height);
-    img11.copyTo();
+      img11.copy(cam, 0, 0, cam.width, cam.height, 
+        0, 0, img11.width, img11.height);
+      img11.copyTo();
 
-    img21.copy(cam, 0, 0, cam.width, cam.height, 
-      0, 0, img21.width, img21.height);
-    img21.copyTo();
+      img21.copy(cam, 0, 0, cam.width, cam.height, 
+        0, 0, img21.width, img21.height);
+      img21.copyTo();
 
-    img22.copy(cam, 0, 0, cam.width, cam.height, 
-      0, 0, img21.width, img21.height);
-    img22.copyTo();
+      img22.copy(cam, 0, 0, cam.width, cam.height, 
+        0, 0, img21.width, img21.height);
+      img22.copyTo();
 
-    Mat gris = img11.getGrey();
+      Mat gris = img11.getGrey();
 
-    cpMat2CVImage(gris, img12);
+      cpMat2CVImage(gris, img12);
 
-    applyThreshold(img21);
-    applyColor(img22);
+      applyThreshold(img21);
+      applyColor(img22);
 
-    image(img11, 0, 0, width / 2, height / 2);
-    image(img12, width / 2, 0, width / 2, height / 2);
-    image(img21, 0, height / 2, width / 2, height / 2);
-    image(img22, width / 2, height / 2, width / 2, height / 2);
+      image(img11, 0, 0, width / 2, height / 2);
+      image(img12, width / 2, 0, width / 2, height / 2);
+      image(img21, 0, height / 2, width / 2, height / 2);
+      image(img22, width / 2, height / 2, width / 2, height / 2);
 
-    gris.release();
-  }
+      gris.release();
+    }
+  } else
+    mainScreen();
 
   if (keyPressed) {
     if (key == 'd' || key == 'D')
@@ -126,4 +130,25 @@ void cpMat2CVImage(Mat in_mat, CVImage out_img) {
     }
   }
   out_img.updatePixels();
+}
+
+void keyReleased() {
+  if (key == 'H' || key == 'h')
+    mainScreen = !mainScreen;
+}
+
+void mainScreen() {
+  background(0);
+  textSize(40);
+  text("Graphic Video Capture", width / 2 - 220, 100);
+  textSize(30);
+  text("Top left image is the original", width / 2 - 500, 200);
+  text("Top right image is black and white", width / 2 - 500, 250);
+  text("Bottom left image has a filter", width / 2 - 500, 300);
+  text("To move it press w/s (up/down) a/d (left/right) ", width / 2 - 400, 350);
+  text("Bottom right image has color a filter", width / 2 - 500, 400);
+  text("Change color pressing u/j (red), i/k (green) and o/l (blue)", width / 2 - 400, 450);
+  text("Press H to return to main screen", width / 2 - 500, 500);
+  textSize(20);
+  text("Press H to continue", width / 2 - 100, height / 2 + 300);
 }
